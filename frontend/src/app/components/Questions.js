@@ -26,6 +26,33 @@ const QA = [
 		aFour: 'Computer Graphics Design',
 		correctAnswer: 'Computer Design Technology',
 	},
+	{
+		id: 4,
+		question: 'Who was the first guest to appear on the Trash Taste podcast?',
+		aOne: 'sydsnap',
+		aTwo: 'Mori Calliope',
+		aThree: 'Abroad in Japan',
+		aFour: 'Noriyaro',
+		correctAnswer: 'Abroad in Japan',
+	},
+	{
+		id: 5,
+		question: 'Trash Taste episode 11 featured an ex Japanese pornstar by the name of?',
+		aOne: 'Hitomi Tanaka',
+		aTwo: 'Marica Hase',
+		aThree: 'Yui Hatano',
+		aFour: 'Shibuya Kaho',
+		correctAnswer: 'Shibuya Kaho',
+	},
+	{
+		id: 6,
+		question: 'What is the name of the second Trash Taste Youtube channel?',
+		aOne: 'Trash Taste Extra Trashy',
+		aTwo: 'Trash Taste After Dark',
+		aThree: 'Trash Taste Ultra Garbage',
+		aFour: 'Trashier Taste',
+		correctAnswer: 'Trash Taste After Dark',
+	},
 ]
 
 export default QA

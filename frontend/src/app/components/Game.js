@@ -6,41 +6,60 @@ import QA from './Questions'
 import { useState, useEffect } from 'react'
 
 export default function Game({ gameState }) {
-
-   const timingOfQuestions = 10
-	const numOfQuestions = QA.length
-   const [questNum, setQuestNum] = useState(0)
-   const shuffledQuestions = useState(shuffle(QA))
-	const [quizTimer, setQuizTimer] = useState(numOfQuestions * timingOfQuestions)
+	const timingOfQuestions = 10
+	const [questNum, setQuestNum] = useState(0)
+	const shuffledQuestions = useState(shuffle(QA))
+	const [quizTimer, setQuizTimer] = useState(60)
 	const [questTimer, setQuestTimer] = useState(timingOfQuestions)
 	const [time, setTime] = useState(0)
-   const [gameOver, setGameOver] = useState(false)
-   const [correctNum, setCorrectNum] = useState(0)
+	const [gameOver, setGameOver] = useState(false)
+	const [correctNum, setCorrectNum] = useState(0)
+	const [totalScore, setTotalScore] = useState(0)
+	const [loading, setLoading] = useState(false)
 
-	function shuffle (array) {
+	function shuffle(array) {
 		return array
 			.map((a) => ({ sort: Math.random(), value: a }))
 			.sort((a, b) => a.sort - b.sort)
 			.map((a) => a.value)
-   }
+	}
 
-   function checkAnswer(answer, index) {
-      let arr = shuffledQuestions[0]
-      if (answer == arr[index].correctAnswer) {
-         setCorrectNum(correctNum + 1)
-         setQuestNum(questNum + 1)
-         setQuestTimer(timingOfQuestions)
-      } else {
-         setQuestNum(questNum + 1)
-         setQuestTimer(timingOfQuestions)
-      }
-   }
+	function checkAnswer(answer, index) {
+		let arr = shuffledQuestions[0]
+		if (answer == arr[index].correctAnswer) {
+			setCorrectNum(correctNum + 1)
+			setQuestNum(questNum + 1)
+			setQuestTimer(timingOfQuestions)
+		} else {
+			setQuestNum(questNum + 1)
+			setQuestTimer(timingOfQuestions)
+		}
+	}
 
-   useEffect(() => {
-      if (questNum > shuffledQuestions[0].length - 1) {
-         setGameOver(true)
-      }
-   }, [questNum])
+	function calculateTotalScore() {
+		let score = Math.round((correctNum / questNum) * 100) + correctNum
+		if (score < 0) {
+			setTotalScore(0)
+		} else {
+			setTotalScore(score)
+		}
+	}
+
+	useEffect(() => {
+		if (gameOver) {
+			calculateTotalScore()
+			setLoading(true)
+			setTimeout(() => {
+				setLoading(false)
+			}, 3000)
+		}
+	}, [gameOver])
+
+	useEffect(() => {
+		if (questNum > shuffledQuestions[0].length - 1) {
+			setGameOver(true)
+		}
+	}, [questNum])
 
 	useEffect(() => {
 		setTimeout(() => {
@@ -53,34 +72,34 @@ export default function Game({ gameState }) {
 	}, [quizTimer])
 
 	useEffect(() => {
-		const questionTimer = setTimeout(() => {
-			if (questTimer > 1) {
-				setQuestTimer(questTimer - 1)
-			} else {
-				setQuestNum(questNum + 1)
-				setQuestTimer(timingOfQuestions)
-			}
-      }, 1000)
-      return () => clearTimeout(questionTimer)
+		if (gameOver == false) {
+			const questionTimer = setTimeout(() => {
+				if (questTimer > 1) {
+					setQuestTimer(questTimer - 1)
+				} else {
+					setQuestNum(questNum + 1)
+					setQuestTimer(timingOfQuestions)
+				}
+			}, 1000)
+			return () => clearTimeout(questionTimer)
+		}
 	}, [questTimer])
 
 	useEffect(() => {
-		setTimeout(() => {
-			if (!gameOver) {
-				setTime(time + 1)
-			}
-		}, 1000)
+		if (gameOver == false) {
+			const timer = time < 60 && setInterval(() => setTime(time + 1), 1000)
+			return () => clearInterval(timer)
+		}
 	}, [time])
 
 	return (
 		<main className={styles.gameBox}>
-			{!gameOver ? (
+			{!gameOver && !loading && (
 				<>
 					{shuffledQuestions[0].map((question, index) => {
 						if (index == questNum) {
 							return (
 								<section key={question.id}>
-									<p className={styles.timer}>Time Elapsed: {time}s</p>
 									<h3>{question.question}</h3>
 									<div className={styles.answers}>
 										<h4 onClick={() => checkAnswer(question.aOne, index)}>{question.aOne}</h4>
@@ -101,16 +120,24 @@ export default function Game({ gameState }) {
 						}
 					})}
 				</>
-			) : (
+			)}
+			{gameOver && !loading && (
 				<section>
 					<h1>GAME OVER</h1>
+					<h2 className={styles.totalScore}>Total Score: {totalScore} points</h2>
 					<div className={styles.divider}></div>
-					<h3 className={styles.summaryTxt}>Score: {Math.round((correctNum / numOfQuestions) * 100)}%</h3>
-					<h3 className={styles.summaryTxt}>Your Time: {time}s</h3>
+					<h3 className={styles.summaryTxt}>Grade: {Math.round((correctNum / questNum) * 100)}%</h3>
+					<h3 className={styles.summaryTxt}>Questions Answered: {questNum}</h3>
+					<h3 className={styles.summaryTxt}>Correctly Answered: {correctNum}</h3>
 					<div className={styles.divider}></div>
 					<span className={styles.endBtnTwo} onClick={() => gameState(false)}>
 						RETURN HOME
 					</span>
+				</section>
+			)}
+			{gameOver && loading && (
+				<section>
+					<h2 className={styles.calculate}>Calculating Score...</h2>
 				</section>
 			)}
 		</main>
