@@ -2,7 +2,7 @@
 
 import styles from './page.module.css'
 import Nav from './components/Nav'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Game from './components/Game'
 import Footer from './components/Footer'
 
